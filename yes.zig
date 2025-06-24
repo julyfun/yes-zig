@@ -1,8 +1,6 @@
 const std = @import("std");
-const builtin = @import("builtin");
 
 const Allocator = std.mem.Allocator;
-const File = std.fs.File;
 
 const program_name = "yes";
 const buffer_size = 64 * 1024; // 64KB
