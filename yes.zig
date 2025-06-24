@@ -5,6 +5,7 @@ const Allocator = std.mem.Allocator;
 const File = std.fs.File;
 
 const program_name = "yes";
+const buffer_size = 64 * 1024; // 64KB
 
 fn usage(status: u8) noreturn {
     if (status != 0) {
@@ -69,14 +70,15 @@ pub fn main() !void {
     const stdout = std.io.getStdOut();
     const writer = stdout.writer();
 
-    const buffer_size = @max(output.len, 4096);
     var buffer = try allocator.alloc(u8, buffer_size);
     defer allocator.free(buffer);
 
     var bytes_written: usize = 0;
     while (bytes_written < buffer_size) {
-        const copy_size = @min(output.len, buffer_size - bytes_written);
-        @memcpy(buffer[bytes_written..][0..copy_size], output);
+        const remaining = buffer_size - bytes_written;
+        const copy_size = if (remaining >= output.len) output.len else remaining;
+
+        @memcpy(buffer[bytes_written .. bytes_written + copy_size], output[0..copy_size]);
         bytes_written += copy_size;
     }
 
